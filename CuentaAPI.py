@@ -1,6 +1,6 @@
 from typing import Union
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from models.cliente import Cliente
 from models.cuenta import Cuenta
@@ -10,7 +10,7 @@ from fastapi.encoders import jsonable_encoder
 
 app = FastAPI()
 
-
+posts = []
 #Recursos
 # 1 - Cliente
 # Registrar - POST /clientes
@@ -25,6 +25,10 @@ app = FastAPI()
 # - GET /pagos/{pk} 
 # - PUT /pagos/{pk}
 # - DELETE /pagos/{pk}
+
+@app.get('/')
+def read_root():
+    return {"Bienvenidos a Telefonia RT"}
 
 @app.get("/clientes/morosos", operation_id="clientes_morosos",
     summary="Listado de cliente morosos",
@@ -51,3 +55,24 @@ def recuperar_clientes():
 def recuperar_cliente(id:int):
     cliente: Cliente= Repositorio.recuperar_cliente(id)
     return cliente
+
+
+@app.delete('/clientes/{id}')
+def delete_cliente(id:int):
+    for cliente in  Cliente:
+        if post["id"] == post_id:
+            posts.pop(index)
+            return {"message": "Post has been deleted succesfully"}
+    
+    raise HTTPException(status_code=404, detail="Código 404 Bad Request")
+
+@app.put('/clientes/{id}')
+def update_cliente(id:int, updatedPost: Cliente):
+    for index, Cliente in enumerate(posts):
+        if Cliente["id"] == id:
+            posts[index]["cedula"]= updatedPost.dict()["cedula"]
+            posts[index]["nombre"]= updatedPost.dict()["nombre"]
+            posts[index]["apellido"]= updatedPost.dict()["apellido"]
+            posts[index]["cuenta_debito"]= updatedPost.dict()["cuenta_debito"]
+            return {"message": "Post has been updated succesfully"}
+    raise HTTPException(status_code=404, detail="Código 404 Bad Request")

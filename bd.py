@@ -22,4 +22,12 @@ class Repositorio:
     def recuperar_cliente(cls, id:int):
         return cls.clienteTabla[id]
 
+    @classmethod
+    def delete_cliente(cls, id:int):
+        return cls.clienteTabla[id]
+
+    @classmethod
+    def update_cliente(cls, id:int):
+        return cls.clienteTabla[id]
+
 
