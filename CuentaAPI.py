@@ -10,7 +10,6 @@ from fastapi.encoders import jsonable_encoder
 
 app = FastAPI()
 
-posts = []
 #Recursos
 # 1 - Cliente
 # Registrar - POST /clientes
@@ -29,13 +28,6 @@ posts = []
 @app.get('/')
 def read_root():
     return {"Bienvenidos a Telefonia RT"}
-
-@app.get("/clientes/morosos", operation_id="clientes_morosos",
-    summary="Listado de cliente morosos",
-    description="Listado de clientes morosos del ultimo mes correspondiente a la cartera rodados"
-)
-def cliente_morosos():
-    return ["Carlos", "Felipe", "Manuel"]
 
 @app.post("/clientes", operation_id="registar_cliente")
 def registar_cliente(cliente: Cliente):
@@ -58,14 +50,13 @@ def recuperar_cliente(id:int):
 
 
 @app.delete('/clientes/{id}')
-def delete_cliente(id:int):
-    for cliente in  Cliente:
+def delete_cliente(id: int):
+    for index, Cliente in enumerate(posts):
         if post["id"] == post_id:
             posts.pop(index)
             return {"message": "Post has been deleted succesfully"}
+    raise HTTPException(status_code=404, detail="Item not found")
     
-    raise HTTPException(status_code=404, detail="Código 404 Bad Request")
-
 @app.put('/clientes/{id}')
 def update_cliente(id:int, updatedPost: Cliente):
     for index, Cliente in enumerate(posts):
@@ -76,3 +67,32 @@ def update_cliente(id:int, updatedPost: Cliente):
             posts[index]["cuenta_debito"]= updatedPost.dict()["cuenta_debito"]
             return {"message": "Post has been updated succesfully"}
     raise HTTPException(status_code=404, detail="Código 404 Bad Request")
+
+
+
+@app.post("/cuenta", operation_id="registar_cuenta")
+def registar_cuenta(cuenta: Cuenta):
+    Repositorio.insertarCuenta(cuenta)
+    return cuenta
+
+@app.get("/cuenta")
+def recuperar_cuenta():
+    registros: dict[int, Cuenta]= Repositorio.recuperar_cuenta()
+    listObjetos =  list(registros) #lista DE objetos CLIENTES 
+    listaJson = jsonable_encoder(listObjetos) #convertimos lista de objetos a json
+
+    return listaJson
+
+
+@app.get("/cuenta/{id}")
+def recuperar_cuenta(id:int):
+    cuenta: Cuenta= Repositorio.recuperar_cuenta(id)
+    return cuenta
+
+@app.delete('/cuenta/{id}')
+def delete_cuenta(id: int):
+    for index, post in enumerate(posts):
+        if post["id"] == post_id:
+            posts.pop(index)
+            return {"message": "Post has been deleted succesfully"}
+    raise HTTPException(status_code=404, detail="Item not found")
